@@ -1,0 +1,14 @@
+# 환경변수 파일
+.env
+
+# Python 가상환경
+venv/
+
+# Python 컴파일 캐시
+**/__pycache__/
+
+# Mac Finder 메타데이터
+**/.DS_Store
+
+# VSCode 환경 설정 (원하면 주석 처리)
+.vscode/
