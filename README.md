@@ -29,22 +29,24 @@ GPT 질의응답, 날씨 조회, 디바이스 센서 연동 등을 제공합니�
 
 ## 📁 프로젝트 구조
 
+```
 Embedded-Project/
 │── app/
-│ ├── routes/
-│ │ ├── gpt_routes.py
-│ │ ├── weather_routes.py
-│ │ └── device_routes.py
-│ ├── services/
-│ │ ├── gpt_service.py
-│ │ ├── weather_service.py
-│ │ └── device_service.py
-│ └── init.py
+│   ├── routes/
+│   │   ├── gpt_routes.py
+│   │   ├── weather_routes.py
+│   │   └── device_routes.py
+│   ├── services/
+│   │   ├── gpt_service.py
+│   │   ├── weather_service.py
+│   │   └── device_service.py
+│   └── __init__.py
 │
-│── index.html # GPT 질문 UI (fetch 기반)
-│── run.py # 서버 실행 엔트리
+│── index.html                # GPT 질문 UI (fetch 기반)
+│── run.py                    # 서버 실행 엔트리
 │── requirements.txt
 │── .env (깃허브 미포함 → 디스코드에서 다운로드 필수)
+```
 
 
 
