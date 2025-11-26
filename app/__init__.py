@@ -12,15 +12,17 @@ def create_app():
     Swagger(app)
 
     # 기본 라우트 → Swagger UI로 리다이렉트
-    @app.route("/")
-    def index():
+    @app.route("/docs")
+    def docs():
         return redirect("/apidocs")
 
     # 블루프린트 등록
     from app.routes.weather_routes import weather_bp
     from app.routes.device_routes import device_bp
+    from app.routes.gpt_routes import gpt_bp   
 
-    app.register_blueprint(weather_bp, url_prefix="/weather")
-    app.register_blueprint(device_bp, url_prefix="/device")
+    app.register_blueprint(weather_bp, url_prefix="/api/weather")
+    app.register_blueprint(device_bp, url_prefix="/api/device")
+    app.register_blueprint(gpt_bp, url_prefix="/api/gpt")
 
     return app
