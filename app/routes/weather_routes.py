@@ -7,29 +7,39 @@ weather_bp = Blueprint("weather", __name__)
 @weather_bp.route("/current", methods=["GET"])
 @swag_from({
     "tags": ["Weather"],
-    "description": "현재 날씨 정보를 조회합니다.",
+    "description": "현재 날씨 정보를 조회하는 API",
     "parameters": [
         {
             "name": "city",
             "in": "query",
             "type": "string",
             "required": False,
-            "description": "도시 이름 (기본값: .env에 설정된 DEFAULT_CITY)"
+            "description": "조회할 도시 이름 (기본값: .env 의 DEFAULT_CITY)"
         }
     ],
     "responses": {
         200: {
-            "description": "성공적으로 날씨 정보를 반환합니다.",
-            "examples": {
-                "application/json": {
-                    "name": "Busan",
+            "description": "성공적으로 조회된 현재 날씨 정보",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
                     "main": {
-                        "temp": 17.3,
-                        "humidity": 52
+                        "type": "object",
+                        "properties": {
+                            "temp": {"type": "number"},
+                            "humidity": {"type": "number"}
+                        }
                     },
-                    "weather": [
-                        {"description": "broken clouds"}
-                    ]
+                    "weather": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "description": {"type": "string"}
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -37,8 +47,5 @@ weather_bp = Blueprint("weather", __name__)
 })
 def current_weather():
     city = request.args.get("city")
-
-    # city=None 이면 weather_service에서 DEFAULT_CITY 사용
     result = get_current_weather(city)
-
     return jsonify(result)
