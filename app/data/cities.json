@@ -1,0 +1,47 @@
+[
+  { "id": 1835847, "name": "Seoul", "name_ko": "서울" },
+  { "id": 1838519, "name": "Busan", "name_ko": "부산" },
+  { "id": 1835327, "name": "Daegu", "name_ko": "대구" },
+  { "id": 1843561, "name": "Incheon", "name_ko": "인천" },
+  { "id": 1841810, "name": "Gwangju", "name_ko": "광주" },
+  { "id": 1835224, "name": "Daejeon", "name_ko": "대전" },
+  { "id": 1833742, "name": "Ulsan", "name_ko": "울산" },
+
+  { "id": 1846266, "name": "Jeju City", "name_ko": "제주" },
+
+  { "id": 1835553, "name": "Suwon", "name_ko": "수원" },
+  { "id": 1832427, "name": "Yongin", "name_ko": "용인" },
+  { "id": 1897000, "name": "Seongnam-si", "name_ko": "성남" },
+  { "id": 1842485, "name": "Goyang-si", "name_ko": "고양" },
+  { "id": 1838716, "name": "Bucheon-si", "name_ko": "부천" },
+  { "id": 1846918, "name": "Ansan-si", "name_ko": "안산" },
+  { "id": 1846898, "name": "Anyang-si", "name_ko": "안양" },
+  { "id": 1838343, "name": "Pyeongtaek", "name_ko": "평택" },
+  { "id": 1833788, "name": "Uijeongbu-si", "name_ko": "의정부" },
+
+  { "id": 1845136, "name": "Chuncheon", "name_ko": "춘천" },
+  { "id": 1843137, "name": "Gangneung", "name_ko": "강릉" },
+  { "id": 1833105, "name": "Wŏnju", "name_ko": "원주" },
+
+  { "id": 1845604, "name": "Cheongju-si", "name_ko": "청주" },
+  { "id": 1845033, "name": "Chungju", "name_ko": "충주" },
+
+  { "id": 1845759, "name": "Cheonan", "name_ko": "천안" },
+  { "id": 1839726, "name": "Asan", "name_ko": "아산" },
+  { "id": 1842616, "name": "Gongju", "name_ko": "공주" },
+
+  { "id": 1845457, "name": "Jeonju", "name_ko": "전주" },
+  { "id": 1842025, "name": "Gunsan", "name_ko": "군산" },
+  { "id": 1843491, "name": "Iksan", "name_ko": "익산" },
+
+  { "id": 1841066, "name": "Mokpo", "name_ko": "목포" },
+  { "id": 1835648, "name": "Suncheon", "name_ko": "순천" },
+
+  { "id": 1839071, "name": "Pohang", "name_ko": "포항" },
+  { "id": 1841603, "name": "Gyeongju", "name_ko": "경주" },
+  { "id": 1842225, "name": "Gumi", "name_ko": "구미" },
+
+  { "id": 1846326, "name": "Changwon", "name_ko": "창원" },
+  { "id": 1842943, "name": "Kimhae", "name_ko": "김해" },
+  { "id": 1846052, "name": "Chinju", "name_ko": "진주" }
+]

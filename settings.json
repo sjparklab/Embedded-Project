@@ -1,0 +1,9 @@
+{
+  "location": "1835848",
+  "temperatureUnit": "celsius",
+  "autoRefresh": true,
+  "refreshInterval": 30,
+  "ttsEnabled": true,
+  "ttsSpeed": 1.0,
+  "ttsPitch": 1.0
+}
