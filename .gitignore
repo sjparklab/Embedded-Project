@@ -1,43 +1,53 @@
-# Node
-/node_modules
-**/node_modules
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# ============================
+#  환경 변수 파일
+# ============================
+.env
+.env.*
+settings.json
 
-# Vite / React build output
+# ============================
+#  Python 관련
+# ============================
+# 가상환경
+venv/
+env/
+
+# Python 캐시
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# ============================
+#  Node / Frontend 관련
+# ============================
+# Node 패키지
+client/node_modules/
+node_modules/
+
+# 빌드 산출물
 dist/
 build/
 
-# Dependencies
-.pnp
-.pnp.js
-
-# Logs
-logs
+# 로그
 *.log
-*.log.*
-log/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 
-# IDE / Editor files
+# ============================
+#  OS / 에디터 파일
+# ============================
+# macOS 메타데이터
+**/.DS_Store
+
+# VSCode 설정 (원하면 주석 처리)
 .vscode/
+
+# JetBrains (PyCharm 등)
 .idea/
-*.swp
-.DS_Store
 
-# Environment Files
-.env
-.env.local
-.env.*
-
-# Python / Flask backend
-__pycache__/
-*.pyc
-instance/
-settings.json
-
-# Other
-coverage/
-temp/
+# ============================
+#  기타 캐시 / 임시 데이터
+# ============================
 .cache/
+temp/
