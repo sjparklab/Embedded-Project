@@ -18,13 +18,20 @@ latest_sensor_data = {
 def read_sensor_data():
     """Sense HAT에서 온도와 습도를 읽어옴"""
     from datetime import datetime
+    import random
 
     if SENSEHAT_AVAILABLE:
-        temp = sense.get_temperature()
-        humidity = sense.get_humidity()
+        try:
+            temp = sense.get_temperature()
+            humidity = sense.get_humidity()
+        except Exception as e:
+            print(f"[ERROR] Sense HAT 센서 읽기 실패: {e}")
+            print("[INFO] Mock 데이터를 사용합니다.")
+            temp = round(20 + random.uniform(-5, 5), 2)
+            humidity = round(50 + random.uniform(-10, 10), 2)
     else:
         # 개발 환경용 목(mock) 데이터
-        import random
+        print("[INFO] Sense HAT이 연결되지 않았습니다. Mock 데이터를 사용합니다.")
         temp = round(20 + random.uniform(-5, 5), 2)
         humidity = round(50 + random.uniform(-10, 10), 2)
 
