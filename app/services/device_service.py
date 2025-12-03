@@ -28,10 +28,11 @@ latest_sensor_data = {
 }
 
 def read_sensor_data():
-    """Sense HAT에서 온도와 습도를 읽어옴"""
+    """Sense HAT에서 온도와 습도를 읽고, CO2 센서도 함께 읽어옴"""
     from datetime import datetime
     import random
 
+    # 1. Sense HAT 온도/습도 읽기
     if SENSEHAT_AVAILABLE:
         try:
             temp = sense.get_temperature()
@@ -47,9 +48,13 @@ def read_sensor_data():
         temp = round(20 + random.uniform(-5, 5), 2)
         humidity = round(50 + random.uniform(-10, 10), 2)
 
-    # 내부적으로 최신 데이터 저장
+    # 2. CO2 센서 읽기
+    co2_value = _read_co2_internal()
+
+    # 3. 내부적으로 최신 데이터 저장
     latest_sensor_data["temperature"] = round(temp, 2)
     latest_sensor_data["humidity"] = round(humidity, 2)
+    latest_sensor_data["co2"] = co2_value
     latest_sensor_data["timestamp"] = datetime.now().isoformat()
 
     return latest_sensor_data.copy()
@@ -58,9 +63,8 @@ def get_latest_sensor_data():
     """저장된 최신 센서 데이터 반환"""
     return latest_sensor_data.copy()
 
-def read_co2_sensor():
-    """UART를 통해 CO2 센서에서 데이터를 읽어옴"""
-    from datetime import datetime
+def _read_co2_internal():
+    """내부용: CO2 센서 값만 읽어서 반환 (저장하지 않음)"""
     import random
 
     if SERIAL_AVAILABLE:
@@ -86,15 +90,23 @@ def read_co2_sensor():
                 co2_value = random.randint(400, 1000)
 
             ser.close()
+            return co2_value
 
         except Exception as e:
             print(f"[ERROR] CO2 센서 읽기 실패: {e}")
             print("[INFO] Mock 데이터를 사용합니다.")
-            co2_value = random.randint(400, 1000)
+            return random.randint(400, 1000)
     else:
         # pyserial 없을 때 mock 데이터
         print("[INFO] pyserial이 설치되지 않았습니다. Mock 데이터를 사용합니다.")
-        co2_value = random.randint(400, 1000)
+        return random.randint(400, 1000)
+
+def read_co2_sensor():
+    """UART를 통해 CO2 센서에서 데이터를 읽어옴 (API 엔드포인트용)"""
+    from datetime import datetime
+
+    # CO2 센서 읽기
+    co2_value = _read_co2_internal()
 
     # 내부적으로 최신 데이터 저장
     latest_sensor_data["co2"] = co2_value
