@@ -27,6 +27,10 @@ def create_app():
     # Swagger 적용
     Swagger(app, config=swagger_config, template_file=None)
 
+    # 백그라운드 스케줄러 시작
+    from app.scheduler import start_scheduler
+    start_scheduler()
+
     # -------- 루트('/') --------
     @app.route("/")
     def root():
