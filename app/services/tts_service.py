@@ -31,9 +31,10 @@ def play_tts(text: str, lang: str = 'ko') -> None:
                 temp_file = fp.name
 
             # TTS 생성
-            logger.info(f"gTTS로 음성 생성 중: {text[:50]}...")
+            print(f"[TTS] gTTS로 음성 생성 중: {text[:50]}...")
             tts = gTTS(text=text, lang=lang, slow=False)
             tts.save(temp_file)
+            print(f"[TTS] MP3 파일 생성 완료: {temp_file}")
 
             # 시스템 명령어로 재생
             # ffplay: 블루투스 포함 모든 오디오 장치 지원, 오류 메시지 최소화
@@ -47,12 +48,22 @@ def play_tts(text: str, lang: str = 'ko') -> None:
             played = False
             for player_cmd in players:
                 try:
-                    subprocess.run(player_cmd, check=True, timeout=30,
-                                   stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                    print(f"[TTS] 재생 시도: {' '.join(player_cmd)}")
+                    result = subprocess.run(player_cmd, check=True, timeout=30,
+                                           stderr=subprocess.PIPE, stdout=subprocess.PIPE)
                     played = True
-                    logger.info(f"TTS 재생 완료 (gTTS + {player_cmd[0]}): {text[:50]}...")
+                    print(f"[TTS] ✅ 재생 완료 ({player_cmd[0]}): {text[:50]}...")
                     break
-                except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+                except FileNotFoundError as e:
+                    print(f"[TTS] ❌ {player_cmd[0]} 찾을 수 없음")
+                    continue
+                except subprocess.CalledProcessError as e:
+                    print(f"[TTS] ❌ {player_cmd[0]} 실행 오류: returncode={e.returncode}")
+                    if e.stderr:
+                        print(f"[TTS] stderr: {e.stderr.decode()}")
+                    continue
+                except subprocess.TimeoutExpired as e:
+                    print(f"[TTS] ❌ {player_cmd[0]} 타임아웃")
                     continue
 
             # 정리
@@ -62,12 +73,12 @@ def play_tts(text: str, lang: str = 'ko') -> None:
             if played:
                 return
             else:
-                logger.warning("오디오 플레이어를 찾을 수 없음 (ffplay, mpg123, cvlc). espeak 시도...")
+                print(f"[TTS] ❌ 오디오 플레이어를 찾을 수 없음 (ffplay, mpg123, cvlc). espeak 시도...")
 
         except ImportError:
-            logger.warning("gTTS가 설치되지 않음. espeak 시도...")
+            print(f"[TTS] ❌ gTTS가 설치되지 않음. espeak 시도...")
         except Exception as e:
-            logger.warning(f"gTTS 실행 중 오류: {e}, espeak 시도...")
+            print(f"[TTS] ❌ gTTS 실행 중 오류: {e}, espeak 시도...")
 
         # 방법 2: espeak 사용 (오프라인, 폴백)
         try:
@@ -75,17 +86,18 @@ def play_tts(text: str, lang: str = 'ko') -> None:
 
             # espeak 명령어로 직접 재생
             voice = 'ko' if lang == 'ko' else 'en'
+            print(f"[TTS] espeak으로 재생 시도...")
             subprocess.run(['espeak', '-v', voice, '-s', '150', text], check=True)
 
-            logger.info(f"TTS 재생 완료 (espeak): {text[:50]}...")
+            print(f"[TTS] ✅ TTS 재생 완료 (espeak): {text[:50]}...")
             return
 
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
-            logger.warning(f"espeak 실행 실패: {e}")
+            print(f"[TTS] ❌ espeak 실행 실패: {e}")
 
         # 모든 방법 실패
         raise Exception("TTS 재생 실패: gTTS는 설치되었지만 오디오 플레이어(mpg123, ffplay, cvlc)가 없습니다. 'sudo apt-get install mpg123' 실행하세요.")
 
     except Exception as e:
-        logger.error(f"TTS 재생 오류: {str(e)}")
+        print(f"[TTS] ❌ TTS 재생 오류: {str(e)}")
         raise
