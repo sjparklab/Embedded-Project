@@ -11,7 +11,6 @@ APScheduler==3.10.4
 
 # TTS (Text-to-Speech) 라이브러리
 gTTS==2.5.0          # Google Text-to-Speech (인터넷 필요)
-pygame==2.5.2        # 오디오 재생용
 
 # Raspberry Pi only (라즈베리파이에서만 설치)
 # sense-hat==2.6.0

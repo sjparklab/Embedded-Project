@@ -21,44 +21,56 @@ def play_tts(text: str, lang: str = 'ko') -> None:
         Exception: TTS 재생 실패 시
     """
     try:
-        # 방법 1: gTTS 사용 (인터넷 필요)
+        # 방법 1: gTTS + 시스템 오디오 플레이어 (최우선, 음질 좋음)
         try:
             from gtts import gTTS
-            import pygame
+            import subprocess
 
             # 임시 파일 생성
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
                 temp_file = fp.name
 
             # TTS 생성
+            logger.info(f"gTTS로 음성 생성 중: {text[:50]}...")
             tts = gTTS(text=text, lang=lang, slow=False)
             tts.save(temp_file)
 
-            # pygame으로 재생
-            pygame.mixer.init()
-            pygame.mixer.music.load(temp_file)
-            pygame.mixer.music.play()
+            # 시스템 명령어로 재생 (우선순위: mpg123 > ffplay > cvlc)
+            players = [
+                ['mpg123', '-q', temp_file],  # 가장 가벼움
+                ['ffplay', '-nodisp', '-autoexit', '-loglevel', 'quiet', temp_file],
+                ['cvlc', '--play-and-exit', '--quiet', temp_file],
+            ]
 
-            # 재생 완료까지 대기
-            while pygame.mixer.music.get_busy():
-                pygame.time.Clock().tick(10)
+            played = False
+            for player_cmd in players:
+                try:
+                    subprocess.run(player_cmd, check=True, timeout=30)
+                    played = True
+                    logger.info(f"TTS 재생 완료 (gTTS + {player_cmd[0]}): {text[:50]}...")
+                    break
+                except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+                    continue
 
             # 정리
-            pygame.mixer.quit()
-            os.remove(temp_file)
+            if os.path.exists(temp_file):
+                os.remove(temp_file)
 
-            logger.info(f"TTS 재생 완료 (gTTS): {text[:50]}...")
-            return
+            if played:
+                return
+            else:
+                logger.warning("오디오 플레이어를 찾을 수 없음 (mpg123, ffplay, cvlc). espeak 시도...")
 
         except ImportError:
-            logger.warning("gTTS 또는 pygame이 설치되지 않음. espeak 시도...")
+            logger.warning("gTTS가 설치되지 않음. espeak 시도...")
+        except Exception as e:
+            logger.warning(f"gTTS 실행 중 오류: {e}, espeak 시도...")
 
-        # 방법 2: espeak 사용 (오프라인, Linux 전용)
+        # 방법 2: espeak 사용 (오프라인, 폴백)
         try:
             import subprocess
 
             # espeak 명령어로 직접 재생
-            # -v: 언어/목소리, -s: 속도 (기본 175)
             voice = 'ko' if lang == 'ko' else 'en'
             subprocess.run(['espeak', '-v', voice, '-s', '150', text], check=True)
 
@@ -68,34 +80,8 @@ def play_tts(text: str, lang: str = 'ko') -> None:
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             logger.warning(f"espeak 실행 실패: {e}")
 
-        # 방법 3: pyttsx3 사용 (오프라인, 크로스 플랫폼)
-        try:
-            import pyttsx3
-
-            engine = pyttsx3.init()
-
-            # 한국어 음성 설정 (가능한 경우)
-            if lang == 'ko':
-                voices = engine.getProperty('voices')
-                for voice in voices:
-                    if 'korean' in voice.name.lower() or 'ko' in voice.languages:
-                        engine.setProperty('voice', voice.id)
-                        break
-
-            engine.setProperty('rate', 150)  # 속도
-            engine.setProperty('volume', 1.0)  # 볼륨
-
-            engine.say(text)
-            engine.runAndWait()
-
-            logger.info(f"TTS 재생 완료 (pyttsx3): {text[:50]}...")
-            return
-
-        except ImportError:
-            logger.warning("pyttsx3가 설치되지 않음")
-
         # 모든 방법 실패
-        raise Exception("TTS 라이브러리가 설치되지 않았습니다. gTTS, espeak, 또는 pyttsx3를 설치하세요.")
+        raise Exception("TTS 재생 실패: gTTS는 설치되었지만 오디오 플레이어(mpg123, ffplay, cvlc)가 없습니다. 'sudo apt-get install mpg123' 실행하세요.")
 
     except Exception as e:
         logger.error(f"TTS 재생 오류: {str(e)}")
