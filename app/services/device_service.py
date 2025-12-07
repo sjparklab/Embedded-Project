@@ -116,3 +116,67 @@ def read_co2_sensor():
         "co2": co2_value,
         "timestamp": latest_sensor_data["timestamp"]
     }
+    
+blue = (0, 150, 255)
+red = (255, 0, 0)
+nothing = (0,0,0)
+
+def umbrella():
+    B = blue
+    O = nothing
+    img = [
+    O, O, O, B, B, O, O, O,
+    O, O, B, B, B, B, O, O,
+    O, B, B, B, B, B, B, O,
+    B, B, B, B, B, B, B, B,
+    O, O, O, O, B, O, O, O,
+    O, O, O, O, B, O, O, O,
+    O, O, B, O, B, O, O, O,
+    O, O, B, B, B, O, O, O
+    ]
+    sense.set_pixels(img)
+
+def window():
+    B = blue
+    O = nothing
+    img = [
+    O, O, O, O, O, O, O, O,
+    O, B, B, B, O, B, B, B,
+    O, B, B, B, O, B, B, B,
+    O, B, B, B, O, B, B, B,
+    O, O, O, O, O, O, O, O,
+    O, B, B, B, O, B, B, B,
+    O, B, B, B, O, B, B, B,
+    O, B, B, B, O, B, B, B
+    ]
+    sense.set_pixels(img)
+
+def cold():
+    B = blue
+    O = nothing
+    img = [
+    O, B, O, O, B, O, O, B,
+    O, O, B, O, B, O, B, O,
+    O, O, O, B, B, B, O, O,
+    O, B, B, B, B, B, B, B,
+    O, O, O, B, B, B, O, O,
+    O, O, B, O, B, O, B, O,
+    O, B, O, O, B, O, O, B,
+    O, O, O, O, O, O, O, O
+    ]
+    sense.set_pixels(img)
+
+def hot():
+    B = red
+    O = nothing
+    img = [
+    O, B, O, O, B, O, O, B,
+    O, O, B, O, B, O, B, O,
+    O, O, O, B, B, B, O, O,
+    O, B, B, B, B, B, B, B,
+    O, O, O, B, B, B, O, O,
+    O, O, B, O, B, O, B, O,
+    O, B, O, O, B, O, O, B,
+    O, O, O, O, O, O, O, O
+    ]
+    sense.set_pixels(img)
