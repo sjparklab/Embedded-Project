@@ -49,8 +49,20 @@ def play_tts(text: str, lang: str = 'ko') -> None:
             for player_cmd in players:
                 try:
                     print(f"[TTS] 재생 시도: {' '.join(player_cmd)}")
-                    result = subprocess.run(player_cmd, check=True, timeout=30,
-                                           stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+
+                    # 환경 변수 설정: PulseAudio 사용 강제
+                    env = os.environ.copy()
+                    env['SDL_AUDIODRIVER'] = 'pulseaudio'  # SDL(ffplay)에서 PulseAudio 사용
+                    env['AUDIODEV'] = 'pulse'              # 오디오 장치를 pulse로
+                    if 'PULSE_SERVER' not in env:
+                        env['PULSE_SERVER'] = '/run/user/1000/pulse/native'  # PulseAudio 서버 주소
+
+                    # 타임아웃: 텍스트 길이에 따라 동적 조정 (최소 60초)
+                    timeout_seconds = max(60, len(text) // 10)  # 텍스트 10자당 1초, 최소 60초
+
+                    result = subprocess.run(player_cmd, check=True, timeout=timeout_seconds,
+                                           stderr=subprocess.PIPE, stdout=subprocess.PIPE,
+                                           env=env)
                     played = True
                     print(f"[TTS] ✅ 재생 완료 ({player_cmd[0]}): {text[:50]}...")
                     break
