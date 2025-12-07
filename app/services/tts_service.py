@@ -35,20 +35,20 @@ def play_tts(text: str, lang: str = 'ko') -> None:
             tts = gTTS(text=text, lang=lang, slow=False)
             tts.save(temp_file)
 
-            # 시스템 명령어로 재생 (우선순위: mpg123 pulse > mpg123 alsa > ffplay)
-            # -a pulse: PulseAudio 사용 (블루투스 스피커 지원)
-            # -a alsa: ALSA 직접 사용
+            # 시스템 명령어로 재생
+            # ffplay: 블루투스 포함 모든 오디오 장치 지원, 오류 메시지 최소화
+            # -loglevel panic: 오류 메시지 숨김
             players = [
-                ['mpg123', '-q', '-a', 'pulse', temp_file],  # PulseAudio (블루투스)
-                ['mpg123', '-q', '-a', 'alsa', temp_file],   # ALSA (기본)
-                ['ffplay', '-nodisp', '-autoexit', '-loglevel', 'quiet', temp_file],
-                ['cvlc', '--play-and-exit', '--quiet', temp_file],
+                ['ffplay', '-nodisp', '-autoexit', '-loglevel', 'panic', temp_file],  # 최우선 (블루투스 지원)
+                ['mpg123', '-q', temp_file],  # 대체
+                ['cvlc', '--play-and-exit', '--quiet', temp_file],  # 대체2
             ]
 
             played = False
             for player_cmd in players:
                 try:
-                    subprocess.run(player_cmd, check=True, timeout=30)
+                    subprocess.run(player_cmd, check=True, timeout=30,
+                                   stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
                     played = True
                     logger.info(f"TTS 재생 완료 (gTTS + {player_cmd[0]}): {text[:50]}...")
                     break
@@ -62,7 +62,7 @@ def play_tts(text: str, lang: str = 'ko') -> None:
             if played:
                 return
             else:
-                logger.warning("오디오 플레이어를 찾을 수 없음 (mpg123, ffplay, cvlc). espeak 시도...")
+                logger.warning("오디오 플레이어를 찾을 수 없음 (ffplay, mpg123, cvlc). espeak 시도...")
 
         except ImportError:
             logger.warning("gTTS가 설치되지 않음. espeak 시도...")
