@@ -9,6 +9,25 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
+# 현재 재생 중인 프로세스 추적
+current_tts_process = None
+
+def stop_tts() -> None:
+    """
+    현재 재생 중인 TTS 중단
+    """
+    global current_tts_process
+
+    if current_tts_process and current_tts_process.poll() is None:
+        print(f"[TTS] 🛑 재생 중단 요청")
+        current_tts_process.kill()
+        current_tts_process.wait()
+        current_tts_process = None
+        print(f"[TTS] ✅ 재생 중단 완료")
+    else:
+        print(f"[TTS] ℹ️  재생 중인 TTS 없음")
+
+
 def play_tts(text: str, lang: str = 'ko') -> None:
     """
     텍스트를 음성으로 변환하여 라즈베리파이 스피커로 재생
@@ -46,6 +65,8 @@ def play_tts(text: str, lang: str = 'ko') -> None:
             ]
 
             played = False
+            global current_tts_process
+
             for player_cmd in players:
                 try:
                     print(f"[TTS] 재생 시도: {' '.join(player_cmd)}")
@@ -60,11 +81,26 @@ def play_tts(text: str, lang: str = 'ko') -> None:
                     # 타임아웃: 텍스트 길이에 따라 동적 조정 (최소 60초)
                     timeout_seconds = max(60, len(text) // 10)  # 텍스트 10자당 1초, 최소 60초
 
-                    result = subprocess.run(player_cmd, check=True, timeout=timeout_seconds,
-                                           stderr=subprocess.PIPE, stdout=subprocess.PIPE,
-                                           env=env)
-                    played = True
-                    print(f"[TTS] ✅ 재생 완료 ({player_cmd[0]}): {text[:50]}...")
+                    # Popen 사용 (중단 가능하도록)
+                    current_tts_process = subprocess.Popen(
+                        player_cmd,
+                        stderr=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        env=env
+                    )
+
+                    # 재생 완료까지 대기
+                    try:
+                        current_tts_process.wait(timeout=timeout_seconds)
+                        played = True
+                        print(f"[TTS] ✅ 재생 완료 ({player_cmd[0]}): {text[:50]}...")
+                    except subprocess.TimeoutExpired:
+                        print(f"[TTS] ❌ {player_cmd[0]} 타임아웃")
+                        current_tts_process.kill()
+                        current_tts_process = None
+                        continue
+
+                    current_tts_process = None
                     break
                 except FileNotFoundError as e:
                     print(f"[TTS] ❌ {player_cmd[0]} 찾을 수 없음")

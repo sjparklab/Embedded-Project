@@ -52,7 +52,17 @@ export default function FashionRecommendation({ recommendation, isLoading }: Fas
   const handleSpeak = async () => {
     if (!recommendation) return;
 
+    // 재생 중이면 중단
     if (isSpeaking) {
+      try {
+        // 백엔드 TTS 중단 API 호출
+        await fetch('/api/tts/stop', {
+          method: 'POST',
+        });
+        console.log('TTS 재생 중단');
+      } catch (error) {
+        console.error('TTS 중단 오류:', error);
+      }
       setIsSpeaking(false);
       return;
     }

@@ -5,6 +5,31 @@ import logging
 tts_bp = Blueprint('tts', __name__)
 logger = logging.getLogger(__name__)
 
+@tts_bp.route('/stop', methods=['POST'])
+def stop():
+    """
+    TTS 재생 중단
+    ---
+    tags:
+      - TTS
+    responses:
+      200:
+        description: 중단 성공
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "TTS 재생 중단 완료"
+    """
+    try:
+        from app.services.tts_service import stop_tts
+        stop_tts()
+        return jsonify({"message": "TTS 재생 중단 완료"}), 200
+    except Exception as e:
+        logger.error(f"TTS 중단 오류: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 @tts_bp.route('/speak', methods=['POST'])
 def speak():
     """
