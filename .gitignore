@@ -27,6 +27,7 @@ node_modules/
 # 빌드 산출물
 dist/
 build/
+app/static/dist/  # Flask에서 서빙하는 React 빌드 파일
 
 # 로그
 *.log
@@ -51,3 +52,13 @@ pnpm-debug.log*
 # ============================
 .cache/
 temp/
+
+# ============================
+#  Caddy 관련
+# ============================
+# Caddy 자동 생성 파일
+Caddyfile.autosave
+caddy.log
+# Caddy 데이터 디렉토리 (인증서 등)
+.caddy/
+caddy_data/

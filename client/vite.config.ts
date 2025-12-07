@@ -51,7 +51,8 @@
     },
     build: {
       target: 'esnext',
-      outDir: 'build',
+      outDir: '../app/static/dist',  // Flask 정적 파일 경로로 빌드
+      emptyOutDir: true,              // 빌드 전 디렉토리 정리
     },
     server: {
       port: 3000,

@@ -5,8 +5,9 @@ python-dotenv==1.0.0
 requests==2.32.3
 openai == 2.8.1
 pyserial==3.5
+numpy==2.2.4
 opencv-python==4.8.1.78
 APScheduler==3.10.4
 
 # Raspberry Pi only (라즈베리파이에서만 설치)
-sense-hat==2.6.0
+# sense-hat==2.6.0

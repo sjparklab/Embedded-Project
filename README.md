@@ -31,21 +31,34 @@ GPT 질의응답, 날씨 조회, 디바이스 센서 연동 등을 제공합니�
 
 ```
 Embedded-Project/
-│── app/
-│   ├── routes/
-│   │   ├── gpt_routes.py
-│   │   ├── weather_routes.py
-│   │   └── device_routes.py
-│   ├── services/
-│   │   ├── gpt_service.py
-│   │   ├── weather_service.py
-│   │   └── device_service.py
-│   └── __init__.py
+├── app/                      # Flask 백엔드
+│   ├── routes/              # API 라우트
+│   ├── services/            # 비즈니스 로직
+│   └── static/dist/         # 빌드된 React 앱 (자동 생성)
 │
-│── index.html                # GPT 질문 UI (fetch 기반)
-│── run.py                    # 서버 실행 엔트리
-│── requirements.txt
-│── .env (깃허브 미포함 → 디스코드에서 다운로드 필수)
+├── client/                  # React 프론트엔드
+│   ├── src/                 # React 소스 코드
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── run.py                   # Flask 서버 실행 엔트리
+├── requirements.txt         # Python 패키지
+├── Caddyfile               # Caddy 리버스 프록시 설정
+├── dev.bat / dev.sh        # 개발 모드 실행
+├── prod.bat / prod.sh      # 프로덕션 모드 실행
+└── .env                    # 환경 변수 (깃허브 미포함)
+```
+
+### 배포 아키텍처
+
+**개발 모드:**
+```
+React Dev Server :3000 → Flask API :5050
+```
+
+**프로덕션 모드:**
+```
+Caddy :443 (HTTPS) → 정적파일 + Flask API :5050
 ```
 
 
@@ -63,30 +76,103 @@ Embedded-Project/
 
 ---
 
-## 🚀 실행 방법
+## 🚀 빠른 시작
 
-### 1. 패키지 설치
-pip install -r requirements.txt
+### 개발 모드 (일상적인 개발)
 
-### 2. 서버 실행
-python run.py
+**Windows:**
+```bash
+dev.bat
+```
 
-정상 실행 시:
+**Linux/Mac/라즈베리파이:**
+```bash
+chmod +x dev.sh  # 최초 1회만
+./dev.sh
+```
 
-- http://127.0.0.1:5050  
-- http://<PC or Raspberry Pi IP>:5050  
+자동으로 React Dev Server(3000) + Flask API(5050)가 실행됩니다.
+접속: http://localhost:3000
 
-두 주소 모두 접속 가능.
+### 프로덕션 모드 (시연/배포)
+
+**Windows:**
+```bash
+prod.bat
+```
+
+**Linux/Mac/라즈베리파이:**
+```bash
+chmod +x prod.sh  # 최초 1회만
+./prod.sh
+```
+
+React 앱을 빌드한 후 Flask 서버에서 통합 서빙합니다.
+접속: http://localhost:5050
+
+### Caddy로 HTTPS 사용 (외부 접속)
+
+```bash
+# 1. Caddy 설치 (최초 1회)
+# Windows: https://caddyserver.com/download
+# Linux: sudo apt install caddy
+
+# 2. 프로덕션 모드 실행
+./prod.sh  # 또는 prod.bat
+
+# 3. 별도 터미널에서 Caddy 실행
+caddy run
+
+# 접속: https://localhost (자동 HTTPS)
+```
 
 ---
 
-## 🖥 웹 UI 사용 방법
+## 📖 상세 실행 방법
 
-브라우저에서 `/` 로 접속하면 아래 기능 제공:
+### 최초 설정
 
-- 질문 입력 → GPT 스트리밍 응답 표시
-- HTML + JS(fetch) 기반 단일 페이지 UI
-- React/Vue 없이 완전 심플한 구조
+1. **환경 변수 설정**
+   `.env` 파일을 프로젝트 루트에 생성 (디스코드에서 다운로드)
+   ```
+   OPENWEATHER_API_KEY=YOUR_KEY
+   DEFAULT_CITY=Busan
+   OPENAI_API_KEY=YOUR_KEY
+   ```
+
+2. **백엔드 패키지 설치**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **프론트엔드 패키지 설치**
+   ```bash
+   cd client
+   npm install
+   cd ..
+   ```
+
+### 수동 실행 (고급)
+
+**백엔드만 실행:**
+```bash
+python run.py
+# 접속: http://localhost:5050
+```
+
+**프론트엔드만 실행 (개발):**
+```bash
+cd client
+npm run dev
+# 접속: http://localhost:3000
+```
+
+**프론트엔드 빌드:**
+```bash
+cd client
+npm run build
+# 결과물: app/static/dist/
+```
 
 ---
 
