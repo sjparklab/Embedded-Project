@@ -35,9 +35,12 @@ def play_tts(text: str, lang: str = 'ko') -> None:
             tts = gTTS(text=text, lang=lang, slow=False)
             tts.save(temp_file)
 
-            # 시스템 명령어로 재생 (우선순위: mpg123 > ffplay > cvlc)
+            # 시스템 명령어로 재생 (우선순위: mpg123 pulse > mpg123 alsa > ffplay)
+            # -a pulse: PulseAudio 사용 (블루투스 스피커 지원)
+            # -a alsa: ALSA 직접 사용
             players = [
-                ['mpg123', '-q', temp_file],  # 가장 가벼움
+                ['mpg123', '-q', '-a', 'pulse', temp_file],  # PulseAudio (블루투스)
+                ['mpg123', '-q', '-a', 'alsa', temp_file],   # ALSA (기본)
                 ['ffplay', '-nodisp', '-autoexit', '-loglevel', 'quiet', temp_file],
                 ['cvlc', '--play-and-exit', '--quiet', temp_file],
             ]
