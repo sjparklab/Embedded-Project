@@ -47,28 +47,52 @@ export default function FashionRecommendation({ recommendation, isLoading }: Fas
   }, [recommendation]);
 
   // ------------------------------
-  // 🔊 TTS 기능
+  // 🔊 TTS 기능 (라즈베리파이 스피커 출력)
   // ------------------------------
-  const handleSpeak = () => {
+  const handleSpeak = async () => {
     if (!recommendation) return;
 
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
       setIsSpeaking(false);
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(recommendation.text);
-    utterance.lang = 'ko-KR';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
+    try {
+      setIsSpeaking(true);
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+      // 백엔드 TTS API 호출
+      const response = await fetch('/api/tts/speak', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: recommendation.text,
+        }),
+      });
 
-    utteranceRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
+      if (!response.ok) {
+        throw new Error('TTS 재생 실패');
+      }
+
+      // 재생 완료 (백엔드에서 재생이 완료되면 응답이 옴)
+      setIsSpeaking(false);
+
+    } catch (error) {
+      console.error('TTS 오류:', error);
+      setIsSpeaking(false);
+
+      // 폴백: 브라우저 TTS 사용
+      console.log('브라우저 TTS로 폴백...');
+      const utterance = new SpeechSynthesisUtterance(recommendation.text);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      utteranceRef.current = utterance;
+      window.speechSynthesis.speak(utterance);
+    }
   };
 
   // ==========================================================
