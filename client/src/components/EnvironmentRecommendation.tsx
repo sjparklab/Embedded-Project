@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
-import { Volume2, Play, Pause, Sparkles, Loader2 } from 'lucide-react';
+import { Volume2, Play, Pause, ThermometerSun, Loader2 } from 'lucide-react'; // Changed icon to ThermometerSun
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Skeleton } from './ui/skeleton';
 
-interface FashionRecommendationData {
+interface EnvironmentRecommendationData {
   text: string;
 }
 
-interface FashionRecommendationProps {
-  recommendation: FashionRecommendationData | null;
+interface EnvironmentRecommendationProps {
+  recommendation: EnvironmentRecommendationData | null;
   isLoading: boolean;
 }
 
-export default function FashionRecommendation({ recommendation, isLoading }: FashionRecommendationProps) {
+export default function EnvironmentRecommendation({ recommendation, isLoading }: EnvironmentRecommendationProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -113,16 +113,16 @@ export default function FashionRecommendation({ recommendation, isLoading }: Fas
       <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-md ">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-purple-500" />
-            <CardTitle>패션 추천</CardTitle>
+            <ThermometerSun className="w-6 h-6 text-green-500" />
+            <CardTitle>환경 조언</CardTitle>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-5">
           <div className="flex flex-col items-center text-center py-10">
-            <Loader2 className="w-10 h-10 text-purple-500 animate-spin mb-4" />
-            <p className="text-gray-700 font-medium">AI 추천 생성 중…</p>
-            <p className="text-gray-500 text-sm">기온·습도·날씨를 분석하고 있어요</p>
+            <Loader2 className="w-10 h-10 text-green-500 animate-spin mb-4" />
+            <p className="text-gray-700 font-medium">AI 환경 조언 생성 중…</p>
+            <p className="text-gray-500 text-sm">CO2·습도·기온을 분석하고 있어요</p>
           </div>
 
           {/* 기존 skeleton 줄 유지 */}
@@ -146,8 +146,8 @@ export default function FashionRecommendation({ recommendation, isLoading }: Fas
       <CardHeader className="pb-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-yellow-300" />
-            <CardTitle className="text-white">오늘의 패션 추천</CardTitle>
+            <ThermometerSun className="w-6 h-6 text-yellow-300" />
+            <CardTitle className="text-white">오늘의 환경 조언</CardTitle>
           </div>
           <Button
             variant="ghost"
