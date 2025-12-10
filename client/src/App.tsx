@@ -3,6 +3,7 @@ import { Settings, RefreshCw } from 'lucide-react';
 import { Button } from './components/ui/button';
 import WeatherCard from './components/WeatherCard';
 import FashionRecommendation from './components/FashionRecommendation';
+import EnvironmentRecommendation from './components/EnvironmentRecommendation';
 import SettingsDialog from './components/SettingsDialog';
 
 // 타입 정의
@@ -16,13 +17,13 @@ interface WeatherData {
   location: string;
 }
 
-interface FashionRecommendationData {
+interface RecommendationData {
   text: string;
 }
 
 interface UserSettings {
-  location: string;          // city_id
-  temperatureUnit: string;   // "celsius" | "fahrenheit"
+  location: string;
+  temperatureUnit: string;
   autoRefresh: boolean;
   refreshInterval: number;
   ttsEnabled: boolean;
@@ -32,16 +33,19 @@ interface UserSettings {
 
 export default function App() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+
   const [fashionRecommendation, setFashionRecommendation] =
-    useState<FashionRecommendationData | null>(null);
+    useState<RecommendationData | null>(null);
+  const [environmentRecommendation, setEnvironmentRecommendation] =
+    useState<RecommendationData | null>(null);
 
   const [isWeatherLoading, setIsWeatherLoading] = useState(true);
   const [isFashionLoading, setIsFashionLoading] = useState(true);
+  const [isEnvironmentLoading, setIsEnvironmentLoading] = useState(true);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  // 🔥 사용자 설정 저장 state
   const [settings, setSettings] = useState<UserSettings | null>(null);
 
   // ---------------------------
@@ -69,9 +73,9 @@ export default function App() {
     setIsWeatherLoading(true);
 
     try {
-      const res = await fetch(
-        `/api/weather/current?city_id=${settings.location}&unit=${settings.temperatureUnit}`
-      );
+      // ******* 🔥 여기만 수정됨 🔥 *******
+      const res = await fetch(`/api/weather/dashboard`);
+      // ***********************************
 
       const json = await res.json();
       setWeatherData(json);
@@ -94,7 +98,7 @@ export default function App() {
   };
 
   // ---------------------------
-  // 2) 패션 추천 불러오기
+  // 2) 패션 추천
   // ---------------------------
   const fetchFashionRecommendation = async (weather: WeatherData) => {
     setIsFashionLoading(true);
@@ -120,6 +124,32 @@ export default function App() {
   };
 
   // ---------------------------
+  // 3) 환경 조언
+  // ---------------------------
+  const fetchEnvironmentRecommendation = async (weather: WeatherData) => {
+    setIsEnvironmentLoading(true);
+
+    try {
+      const res = await fetch("/api/gpt/environment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(weather),
+      });
+
+      const json = await res.json();
+      setEnvironmentRecommendation(json);
+    } catch (err) {
+      console.error("환경 조언 불러오기 실패:", err);
+
+      setEnvironmentRecommendation({
+        text: "AI 조언 생성 실패. 기본 환경 조언을 표시합니다."
+      });
+    } finally {
+      setIsEnvironmentLoading(false);
+    }
+  };
+
+  // ---------------------------
   // 마운트 시 설정 먼저 로드
   // ---------------------------
   useEffect(() => {
@@ -136,24 +166,19 @@ export default function App() {
   }, [settings]);
 
   // ---------------------------
-  // 날씨 변경 → 패션추천 실행
+  // 날씨 → 패션 · 환경 조언 요청
   // ---------------------------
   useEffect(() => {
     if (weatherData) {
       fetchFashionRecommendation(weatherData);
+      fetchEnvironmentRecommendation(weatherData);
     }
   }, [weatherData]);
 
-  // ---------------------------
-  // 새로고침 버튼
-  // ---------------------------
   const handleRefresh = async () => {
     await fetchWeather();
   };
 
-  // ---------------------------
-  // 설정 저장 후 재로딩
-  // ---------------------------
   const handleSettingsSaved = async () => {
     await loadSettings();
     await fetchWeather();
@@ -198,27 +223,39 @@ export default function App() {
           </div>
         </div>
 
-        {/* 메인 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+        {/* ============================= */}
+        {/* 🚀 새 레이아웃 시작 */}
+        {/* ============================= */}
+        <div className="grid grid-cols-1 gap-6">
 
+          {/* 대시보드 전체 */}
+          <div>
             {settings && (
-              <WeatherCard 
-                data={weatherData} 
+              <WeatherCard
+                data={weatherData}
                 isLoading={isWeatherLoading}
                 unit={settings.temperatureUnit as "celsius" | "fahrenheit"}
               />
             )}
-
           </div>
 
-          <div className="lg:col-span-1">
+          {/* 두 번째 줄: 패션 + 환경 추천 */}
+          <div className="grid grid-cols-2 gap-6">
             <FashionRecommendation
               recommendation={fashionRecommendation}
               isLoading={isFashionLoading}
             />
+
+            <EnvironmentRecommendation
+              recommendation={environmentRecommendation}
+              isLoading={isEnvironmentLoading}
+            />
           </div>
         </div>
+        {/* ============================= */}
+        {/* 🚀 새 레이아웃 끝 */}
+        {/* ============================= */}
+
       </div>
 
       <SettingsDialog
