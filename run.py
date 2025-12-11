@@ -13,4 +13,4 @@ if __name__ == '__main__':
     if port == 80:
         print("⚠️  포트 80 사용: Linux/Mac에서는 'sudo python run.py' 실행 필요")
 
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=5050, debug=True)
