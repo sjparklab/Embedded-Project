@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Settings, RefreshCw } from 'lucide-react';
+import { Settings, RefreshCw, FlaskConical } from 'lucide-react';
 import { Button } from './components/ui/button';
 import WeatherCard from './components/WeatherCard';
 import FashionRecommendation from './components/FashionRecommendation';
 import EnvironmentRecommendation from './components/EnvironmentRecommendation';
 import SettingsDialog from './components/SettingsDialog';
+import DemoPage from './components/DemoPage';
 
 // 타입 정의
 interface WeatherData {
@@ -44,6 +45,7 @@ export default function App() {
   const [isEnvironmentLoading, setIsEnvironmentLoading] = useState(true);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDemoOpen, setIsDemoOpen] = useState(false); // 데모 페이지 상태
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [settings, setSettings] = useState<UserSettings | null>(null);
@@ -191,11 +193,11 @@ export default function App() {
         {/* 헤더 */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-white drop-shadow-lg">
+            <h1 className="text-white drop-shadow-lg text-xl md:text-2xl font-bold">
               5조 ChatGPT 기반 스마트 생활 조언 시스템
             </h1>
 
-            {lastUpdated && (
+            {!isDemoOpen && lastUpdated && (
               <p className="text-white/80 text-sm mt-1">
                 마지막 업데이트: {lastUpdated.toLocaleTimeString("ko-KR")}
               </p>
@@ -203,58 +205,83 @@ export default function App() {
           </div>
 
           <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleRefresh}
-              className="rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm"
-            >
-              <RefreshCw className="w-5 h-5" />
-            </Button>
+            {!isDemoOpen && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsDemoOpen(true)}
+                  className="hidden md:flex items-center gap-2 rounded-full bg-indigo-500/50 hover:bg-indigo-500/70 text-white backdrop-blur-sm border border-indigo-300/30"
+                >
+                  <FlaskConical className="w-4 h-4" />
+                  <span>데모 모드</span>
+                </Button>
+                
+                {/* 모바일용 아이콘 버튼 */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsDemoOpen(true)}
+                  className="md:hidden rounded-full bg-indigo-500/50 hover:bg-indigo-500/70 text-white backdrop-blur-sm border border-indigo-300/30"
+                >
+                  <FlaskConical className="w-5 h-5" />
+                </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSettingsOpen(true)}
-              className="rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm"
-            >
-              <Settings className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleRefresh}
+                  className="rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                </Button>
 
-        {/* ============================= */}
-        {/* 🚀 새 레이아웃 시작 */}
-        {/* ============================= */}
-        <div className="grid grid-cols-1 gap-6">
-
-          {/* 대시보드 전체 */}
-          <div>
-            {settings && (
-              <WeatherCard
-                data={weatherData}
-                isLoading={isWeatherLoading}
-                unit={settings.temperatureUnit as "celsius" | "fahrenheit"}
-              />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsSettingsOpen(true)}
+                  className="rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm"
+                >
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </>
             )}
           </div>
-
-          {/* 두 번째 줄: 패션 + 환경 추천 */}
-          <div className="grid grid-cols-2 gap-6">
-            <FashionRecommendation
-              recommendation={fashionRecommendation}
-              isLoading={isFashionLoading}
-            />
-
-            <EnvironmentRecommendation
-              recommendation={environmentRecommendation}
-              isLoading={isEnvironmentLoading}
-            />
-          </div>
         </div>
-        {/* ============================= */}
-        {/* 🚀 새 레이아웃 끝 */}
-        {/* ============================= */}
+
+        {isDemoOpen ? (
+          <DemoPage onBack={() => setIsDemoOpen(false)} />
+        ) : (
+          /* ============================= */
+          /* 🚀 기존 대시보드 레이아웃 */
+          /* ============================= */
+          <div className="grid grid-cols-1 gap-6 animate-in fade-in zoom-in duration-500">
+
+            {/* 대시보드 전체 */}
+            <div>
+              {settings && (
+                <WeatherCard
+                  data={weatherData}
+                  isLoading={isWeatherLoading}
+                  unit={settings.temperatureUnit as "celsius" | "fahrenheit"}
+                />
+              )}
+            </div>
+
+            {/* 두 번째 줄: 패션 + 환경 추천 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FashionRecommendation
+                recommendation={fashionRecommendation}
+                isLoading={isFashionLoading}
+              />
+
+              <EnvironmentRecommendation
+                recommendation={environmentRecommendation}
+                isLoading={isEnvironmentLoading}
+              />
+            </div>
+          </div>
+        )}
 
       </div>
 

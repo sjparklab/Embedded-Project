@@ -26,17 +26,29 @@ def generate_fashion_text(weather_data):
 상세 설명: {desc_str}
 
 지침:
-- 최대 4~6문장
-- 겉옷/상의/하의/소품 구체적으로 추천
-- 체감 온도, 활동성도 고려
-- 자연스럽고 짧은 한국어 문장으로 작성
+- 출력 형식은 반드시 JSON이어야 합니다.
+- JSON 키: "keyword", "advice"
+- "keyword"는 다음 중 하나 선택: "UMBRELLA", "COLD", "HOT", "NORMAL"
+  - UMBRELLA: 비나 눈이 와서 우산이 필요할 때
+  - COLD: 날씨가 추워 따뜻한 옷차림이 필요할 때
+  - HOT: 날씨가 더워 가벼운 옷차림이 필요할 때
+  - NORMAL: 평범한 날씨일 때
+- "advice": 최대 4~6문장의 구체적인 한국어 옷차림 추천 (겉옷/상의/하의/소품 등)
 """
 
     response = client.chat.completions.create(
         model="gpt-5-nano",
         messages=[
             {"role": "user", "content": prompt}
-        ]
+        ],
+        response_format={"type": "json_object"}
     )
 
-    return response.choices[0].message.content.strip()
+    import json
+    try:
+        content = response.choices[0].message.content.strip()
+        result = json.loads(content)
+        return result
+    except Exception as e:
+        print(f"JSON parsing failed: {e}")
+        return {"keyword": "NORMAL", "advice": content if 'content' in locals() else "추천을 생성할 수 없습니다."}

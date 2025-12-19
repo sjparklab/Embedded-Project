@@ -179,4 +179,30 @@ def hot():
     O, B, O, O, B, O, O, B,
     O, O, O, O, O, O, O, O
     ]
-    sense.set_pixels(img)
+    if SENSEHAT_AVAILABLE:
+        sense.set_pixels(img)
+
+def clear_display():
+    if SENSEHAT_AVAILABLE:
+        sense.clear()
+
+def display_icon_by_keyword(keyword):
+    """GPT 키워드에 따라 SenseHAT에 아이콘을 표시합니다."""
+    if not SENSEHAT_AVAILABLE:
+        print(f"[MOCK] Displaying icon for keyword: {keyword}")
+        return
+
+    if keyword == "VENTILATION":
+        window()
+    elif keyword == "HEATING":
+        hot()  # 난방 (따뜻함)
+    elif keyword == "COOLING":
+        cold() # 냉방 (시원함)
+    elif keyword == "UMBRELLA":
+        umbrella()
+    elif keyword == "COLD":
+        cold()
+    elif keyword == "HOT":
+        hot()
+    else:
+        clear_display()

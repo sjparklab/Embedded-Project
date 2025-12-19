@@ -35,6 +35,10 @@ def create_app():
     from app.scheduler import start_scheduler
     start_scheduler()
 
+    # 조이스틱 리스너 시작
+    from app.services.joystick_service import start_joystick_listener
+    start_joystick_listener()
+
     # -------- Swagger 문서 --------
     @app.route("/docs")
     def docs():
@@ -86,13 +90,15 @@ def create_app():
     from app.routes.cities_routes import cities_bp
     from app.routes.tts_routes import tts_bp
     from app.routes.gpt_environment_routes import gpt_environment_bp # 임포트 확인
+    from app.routes.demo_routes import demo_bp # 데모 라우트 추가
 
     app.register_blueprint(weather_bp, url_prefix="/api/weather")
     app.register_blueprint(device_bp, url_prefix="/api/device")
     app.register_blueprint(gpt_fashion_bp, url_prefix="/api/gpt")
-    app.register_blueprint(gpt_environment_bp, url_prefix="/api/gpt") # [수정] 환경 조언 블루프린트 등록
+    app.register_blueprint(gpt_environment_bp, url_prefix="/api/gpt") 
     app.register_blueprint(settings_bp, url_prefix="/api/settings")
     app.register_blueprint(cities_bp, url_prefix="/api/cities")
     app.register_blueprint(tts_bp, url_prefix="/api/tts")
+    app.register_blueprint(demo_bp, url_prefix="/api/demo") # 데모 블루프린트 등록
 
     return app
