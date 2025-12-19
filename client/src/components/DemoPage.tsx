@@ -115,11 +115,9 @@ export default function DemoPage({ onBack }: DemoPageProps) {
         </h2>
       </div>
 
-      <Card className="bg-white/95 backdrop-blur shadow-xl border-0">
-        <CardHeader>
-          <CardTitle>시나리오 선택</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <h3 className="text-xl font-bold text-white drop-shadow-md mb-4">시나리오 선택</h3>
+      <Card className="bg-white backdrop-blur border-0" style={{ borderRadius: '1rem', boxShadow: '0 10px 40px rgba(0,0,0,0.15)' }}>
+        <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {scenarios.map((scenario, idx) => (
               <Button
@@ -141,7 +139,7 @@ export default function DemoPage({ onBack }: DemoPageProps) {
 
       {/* 결과 표시 영역 */}
       {(loading || result) && (
-        <Card className="bg-white/95 backdrop-blur shadow-xl border-0 border-t-4 border-blue-500">
+        <Card className="bg-white backdrop-blur border-0" style={{ borderRadius: '1rem', boxShadow: '0 10px 40px rgba(0,0,0,0.15)' }}>
           <CardHeader>
             <CardTitle className="flex justify-between items-center">
               <span>테스트 결과: {currentScenario}</span>
@@ -167,7 +165,7 @@ export default function DemoPage({ onBack }: DemoPageProps) {
         </Card>
       )}
       
-      <div className="text-white/60 text-sm text-center">
+      <div className="text-white text-sm text-center drop-shadow-md">
         * 이 모드는 실제 센서 값을 무시하고 강제로 설정된 값을 서버로 전송합니다. <br/>
         * 라즈베리파이 SenseHAT LED가 해당 시나리오에 맞게 변경되는지 확인하세요.
       </div>

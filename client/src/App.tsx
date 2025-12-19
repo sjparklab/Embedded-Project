@@ -209,20 +209,9 @@ export default function App() {
               <>
                 <Button
                   variant="ghost"
-                  size="sm"
-                  onClick={() => setIsDemoOpen(true)}
-                  className="hidden md:flex items-center gap-2 rounded-full bg-indigo-500/50 hover:bg-indigo-500/70 text-white backdrop-blur-sm border border-indigo-300/30"
-                >
-                  <FlaskConical className="w-4 h-4" />
-                  <span>데모 모드</span>
-                </Button>
-                
-                {/* 모바일용 아이콘 버튼 */}
-                <Button
-                  variant="ghost"
                   size="icon"
                   onClick={() => setIsDemoOpen(true)}
-                  className="md:hidden rounded-full bg-indigo-500/50 hover:bg-indigo-500/70 text-white backdrop-blur-sm border border-indigo-300/30"
+                  className="rounded-full bg-indigo-500/50 hover:bg-indigo-500/70 text-white backdrop-blur-sm border border-indigo-300/30"
                 >
                   <FlaskConical className="w-5 h-5" />
                 </Button>

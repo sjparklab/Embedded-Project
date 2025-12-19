@@ -4,9 +4,10 @@ try:
     from sense_hat import SenseHat
     sense = SenseHat()
     SENSEHAT_AVAILABLE = True
-except ImportError:
+except (ImportError, Exception) as e:
+    sense = None
     SENSEHAT_AVAILABLE = False
-    print("Warning: sense_hat library not available. Using mock data.")
+    print(f"Warning: sense_hat library not available ({e}). Using mock data.")
 
 try:
     import serial
@@ -122,6 +123,9 @@ red = (255, 0, 0)
 nothing = (0,0,0)
 
 def umbrella():
+    if not SENSEHAT_AVAILABLE:
+        print("[MOCK] Displaying umbrella icon")
+        return
     B = blue
     O = nothing
     img = [
@@ -137,6 +141,9 @@ def umbrella():
     sense.set_pixels(img)
 
 def window():
+    if not SENSEHAT_AVAILABLE:
+        print("[MOCK] Displaying window icon")
+        return
     B = blue
     O = nothing
     img = [
@@ -152,6 +159,9 @@ def window():
     sense.set_pixels(img)
 
 def cold():
+    if not SENSEHAT_AVAILABLE:
+        print("[MOCK] Displaying cold icon")
+        return
     B = blue
     O = nothing
     img = [
@@ -167,6 +177,9 @@ def cold():
     sense.set_pixels(img)
 
 def hot():
+    if not SENSEHAT_AVAILABLE:
+        print("[MOCK] Displaying hot icon")
+        return
     B = red
     O = nothing
     img = [
@@ -179,8 +192,7 @@ def hot():
     O, B, O, O, B, O, O, B,
     O, O, O, O, O, O, O, O
     ]
-    if SENSEHAT_AVAILABLE:
-        sense.set_pixels(img)
+    sense.set_pixels(img)
 
 def clear_display():
     if SENSEHAT_AVAILABLE:
