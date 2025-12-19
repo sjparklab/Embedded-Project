@@ -73,6 +73,32 @@ export default function DemoPage({ onBack }: DemoPageProps) {
         location: "가상 서울",
         co2: 450
       }
+    },
+    {
+      name: "사람 감지됨 → 환경 조언",
+      mode: "person_detected",
+      data: {
+        person_detected: true,
+        temperature: 24,
+        humidity: 55,
+        weather: "Clear",
+        description: "맑음",
+        location: "가상 서울",
+        co2: 800
+      }
+    },
+    {
+      name: "사람 없음 → 대기",
+      mode: "person_not_detected",
+      data: {
+        person_detected: false,
+        temperature: 24,
+        humidity: 55,
+        weather: "Clear",
+        description: "맑음",
+        location: "가상 서울",
+        co2: 500
+      }
     }
   ];
 
@@ -129,7 +155,10 @@ export default function DemoPage({ onBack }: DemoPageProps) {
               >
                 <div className="font-bold text-lg">{scenario.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  {scenario.mode === 'fashion' ? '👗 복장 추천' : '🏠 환경 조언'}
+                  {scenario.mode === 'fashion' ? '👗 복장 추천' :
+                   scenario.mode === 'person_detected' ? '👤 사람 감지' :
+                   scenario.mode === 'person_not_detected' ? '👻 사람 없음' :
+                   '🏠 환경 조언'}
                 </div>
               </Button>
             ))}

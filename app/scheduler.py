@@ -4,16 +4,25 @@ APScheduler를 사용하여 주기적인 작업 수행
 """
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.services.person_detection_service import detect_person_from_webcam
+from app.services.joystick_service import process_environment_advice
 import atexit
 
 # 스케줄러 인스턴스
 scheduler = None
 
 def scheduled_person_detection():
-    """1시간마다 실행되는 사람 감지 작업"""
+    """1시간마다 실행되는 사람 감지 작업 - 사람이 있으면 환경 조언 제공"""
     print("[SCHEDULER] 정기 사람 감지 시작")
     result = detect_person_from_webcam()
     print(f"[SCHEDULER] 감지 결과: {result['message']}")
+
+    # 사람이 감지되면 실내 환경 조언 실행
+    if result.get("person_detected"):
+        print("[SCHEDULER] 사람 감지됨 → 실내 환경 조언 실행")
+        try:
+            process_environment_advice()
+        except Exception as e:
+            print(f"[SCHEDULER] 환경 조언 실행 중 오류: {e}")
 
 def start_scheduler():
     """스케줄러 시작"""

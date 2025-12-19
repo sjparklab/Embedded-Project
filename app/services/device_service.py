@@ -1,5 +1,7 @@
 # 라즈베리파이 센서 제어 및 API 제작시 여기 삽입
 
+import threading
+
 try:
     from sense_hat import SenseHat
     sense = SenseHat()
@@ -8,6 +10,11 @@ except (ImportError, Exception) as e:
     sense = None
     SENSEHAT_AVAILABLE = False
     print(f"Warning: sense_hat library not available ({e}). Using mock data.")
+
+# LED 자동 끄기 타이머 관련
+LED_TIMEOUT_SECONDS = 15
+_led_timer = None
+_led_timer_lock = threading.Lock()
 
 try:
     import serial
@@ -195,26 +202,68 @@ def hot():
     sense.set_pixels(img)
 
 def clear_display():
+    """LED 디스플레이를 끕니다."""
     if SENSEHAT_AVAILABLE:
         sense.clear()
+    else:
+        print("[MOCK] Clearing display")
+
+def _cancel_led_timer():
+    """기존 LED 타이머가 있으면 취소합니다."""
+    global _led_timer
+    with _led_timer_lock:
+        if _led_timer is not None:
+            _led_timer.cancel()
+            _led_timer = None
+
+def _start_led_timer():
+    """LED를 15초 후 자동으로 끄는 타이머를 시작합니다."""
+    global _led_timer
+    _cancel_led_timer()
+    with _led_timer_lock:
+        _led_timer = threading.Timer(LED_TIMEOUT_SECONDS, _auto_clear_display)
+        _led_timer.daemon = True
+        _led_timer.start()
+        print(f"[LED] 타이머 시작: {LED_TIMEOUT_SECONDS}초 후 자동 꺼짐")
+
+def _auto_clear_display():
+    """타이머에 의해 호출되어 LED를 끕니다."""
+    global _led_timer
+    with _led_timer_lock:
+        _led_timer = None
+    print("[LED] 타이머 만료: 디스플레이 끄기")
+    if SENSEHAT_AVAILABLE:
+        sense.clear()
+    else:
+        print("[MOCK] Auto-clearing display after timeout")
 
 def display_icon_by_keyword(keyword):
-    """GPT 키워드에 따라 SenseHAT에 아이콘을 표시합니다."""
+    """GPT 키워드에 따라 SenseHAT에 아이콘을 표시하고 15초 후 자동으로 끕니다."""
     if not SENSEHAT_AVAILABLE:
         print(f"[MOCK] Displaying icon for keyword: {keyword}")
+        # Mock 환경에서도 타이머 동작 테스트
+        if keyword not in ("NORMAL", None, ""):
+            _start_led_timer()
         return
 
     if keyword == "VENTILATION":
         window()
+        _start_led_timer()
     elif keyword == "HEATING":
         hot()  # 난방 (따뜻함)
+        _start_led_timer()
     elif keyword == "COOLING":
         cold() # 냉방 (시원함)
+        _start_led_timer()
     elif keyword == "UMBRELLA":
         umbrella()
+        _start_led_timer()
     elif keyword == "COLD":
         cold()
+        _start_led_timer()
     elif keyword == "HOT":
         hot()
+        _start_led_timer()
     else:
+        _cancel_led_timer()
         clear_display()
