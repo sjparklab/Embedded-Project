@@ -10,7 +10,7 @@ except (ImportError, Exception) as e:
     print(f"Warning: sense_hat library not available ({e}). Using mock data.")
 
 # LED 자동 끄기 타이머 관련
-LED_TIMEOUT_SECONDS = 15
+LED_TIMEOUT_SECONDS = 30
 _led_timer = None
 _led_timer_lock = threading.Lock()
 

@@ -6,6 +6,25 @@ from app.services.gpt_environment_service import generate_environment_text
 from app.services.gpt_fashion_service import generate_fashion_text
 from app.services.tts_service import play_tts, stop_tts
 
+def show_loading():
+    """처리 중임을 알리는 LED 표시 (노란색 점멸 또는 고정)"""
+    if SENSEHAT_AVAILABLE and sense:
+        # 노란색(R, G, B)으로 화면 중앙에 점 표시 또는 전체 흐릿하게
+        Y = (100, 100, 0)
+        O = (0, 0, 0)
+        # 간단한 모래시계 모양 또는 'L'자
+        img = [
+            O, O, O, O, O, O, O, O,
+            O, O, O, Y, Y, O, O, O,
+            O, O, O, Y, Y, O, O, O,
+            O, O, O, Y, Y, O, O, O,
+            O, O, O, Y, Y, O, O, O,
+            O, O, O, Y, Y, O, O, O,
+            O, O, O, O, O, O, O, O,
+            O, O, O, O, O, O, O, O
+        ]
+        sense.set_pixels(img)
+
 def handle_joystick():
     """조이스틱 이벤트를 무한 루프로 감시하는 함수"""
     global stop_requested
@@ -24,16 +43,16 @@ def handle_joystick():
         try:
             # 이벤트를 하나씩 가져옴 (block=True로 설정하면 이벤트가 올 때까지 대기)
             for event in sense.stick.get_events():
-                # 누름(pressed) 또는 누르고 있음(held) 상태일 때 동작
-                if event.action in ('pressed', 'held'):
+                # 누름(pressed) 상태일 때 동작 (held는 중복 호출 방지를 위해 제외하거나 필요시 추가)
+                if event.action == 'pressed':
                     if event.direction == 'left':
                         print("[JOYSTICK] ⬅️ 왼쪽 감지: 실내 환경 조언 생성 중...")
-                        stop_requested = False
-                        threading.Thread(target=process_environment_advice).start()
+                        show_loading() # 즉시 피드백
+                        process_environment_advice()
                     elif event.direction == 'right':
                         print("[JOYSTICK] ➡️ 오른쪽 감지: 외출 복장 조언 생성 중...")
-                        stop_requested = False
-                        threading.Thread(target=process_fashion_advice).start()
+                        show_loading() # 즉시 피드백
+                        process_fashion_advice()
                     elif event.direction == 'middle':
                         print("[JOYSTICK] ⏺ 가운데 감지: 디스플레이 및 TTS 중단")
                         stop_requested = True
