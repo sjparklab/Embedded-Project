@@ -42,7 +42,7 @@ def person_detect():
     data = detect_person_from_webcam()
     return jsonify(data)
 
-@device_bp.post('/person-detect/trigger')
+@device_bp.get('/person-detect/trigger')
 def trigger_person_detect_action():
     """사람 감지 및 환경 조언 로직을 수동으로 트리거"""
     result = scheduled_person_detection()
