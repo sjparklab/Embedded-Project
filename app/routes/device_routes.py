@@ -3,6 +3,7 @@
 from flask import Blueprint, request, jsonify
 from app.services.device_service import read_sensor_data, get_latest_sensor_data, read_co2_sensor
 from app.services.person_detection_service import detect_person_from_webcam, get_latest_detection
+from app.scheduler import scheduled_person_detection
 
 device_bp = Blueprint('device', __name__, url_prefix='/api/device')
 
@@ -40,6 +41,15 @@ def person_detect():
     """웹캠으로 사람이 있는지 감지"""
     data = detect_person_from_webcam()
     return jsonify(data)
+
+@device_bp.post('/person-detect/trigger')
+def trigger_person_detect_action():
+    """사람 감지 및 환경 조언 로직을 수동으로 트리거"""
+    result = scheduled_person_detection()
+    return jsonify({
+        "message": "Scheduled task triggered manually",
+        "detection_result": result
+    })
 
 @device_bp.get('/person-detect/latest')
 def get_latest_person_detection():

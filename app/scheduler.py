@@ -25,6 +25,8 @@ def scheduled_person_detection():
             process_environment_advice()
         except Exception as e:
             print(f"[SCHEDULER] 환경 조언 실행 중 오류: {e}")
+    
+    return result
 
 def start_scheduler():
     """스케줄러 시작"""
