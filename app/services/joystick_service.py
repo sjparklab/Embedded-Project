@@ -48,11 +48,13 @@ def handle_joystick():
                     if event.direction == 'left':
                         print("[JOYSTICK] ⬅️ 왼쪽 감지: 실내 환경 조언 생성 중...")
                         show_loading() # 즉시 피드백
-                        process_environment_advice()
+                        stop_requested = False
+                        threading.Thread(target=process_environment_advice).start()
                     elif event.direction == 'right':
                         print("[JOYSTICK] ➡️ 오른쪽 감지: 외출 복장 조언 생성 중...")
                         show_loading() # 즉시 피드백
-                        process_fashion_advice()
+                        stop_requested = False
+                        threading.Thread(target=process_fashion_advice).start()
                     elif event.direction == 'middle':
                         print("[JOYSTICK] ⏺ 가운데 감지: 디스플레이 및 TTS 중단")
                         stop_requested = True
