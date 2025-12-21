@@ -24,6 +24,7 @@ except ImportError:
 # CO2 센서 UART 설정
 SERIAL_PORT = '/dev/serial0'
 BAUD_RATE = 9600
+_serial_lock = threading.Lock()
 
 # 최근 센서 데이터를 저장 (내부적으로 사용)
 latest_sensor_data = {
@@ -74,34 +75,35 @@ def _read_co2_internal():
     import random
 
     if SERIAL_AVAILABLE:
-        try:
-            # 시리얼 포트 열기
-            ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+        with _serial_lock:
+            try:
+                # 시리얼 포트 열기
+                ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
 
-            # CO2 읽기 명령 (Hex: 11 01 01 ED)
-            cmd = bytearray([0x11, 0x01, 0x01, 0xED])
+                # CO2 읽기 명령 (Hex: 11 01 01 ED)
+                cmd = bytearray([0x11, 0x01, 0x01, 0xED])
 
-            # 명령 전송
-            ser.write(cmd)
+                # 명령 전송
+                ser.write(cmd)
 
-            # 응답 데이터 읽기 (8바이트)
-            response = ser.read(8)
+                # 응답 데이터 읽기 (8바이트)
+                response = ser.read(8)
 
-            if len(response) == 8:
-                # CO2 농도 = DF1 * 256 + DF2
-                co2_value = response[3] * 256 + response[4]
-                print(f"현재 CO2 농도: {co2_value} ppm")
-            else:
-                print("[WARNING] CO2 센서 응답 없음. Mock 데이터를 사용합니다.")
-                co2_value = random.randint(400, 1000)
+                if len(response) == 8:
+                    # CO2 농도 = DF1 * 256 + DF2
+                    co2_value = response[3] * 256 + response[4]
+                    print(f"현재 CO2 농도: {co2_value} ppm")
+                else:
+                    print("[WARNING] CO2 센서 응답 없음. Mock 데이터를 사용합니다.")
+                    co2_value = random.randint(400, 1000)
 
-            ser.close()
-            return co2_value
+                ser.close()
+                return co2_value
 
-        except Exception as e:
-            print(f"[ERROR] CO2 센서 읽기 실패: {e}")
-            print("[INFO] Mock 데이터를 사용합니다.")
-            return random.randint(400, 1000)
+            except Exception as e:
+                print(f"[ERROR] CO2 센서 읽기 실패: {e}")
+                print("[INFO] Mock 데이터를 사용합니다.")
+                return random.randint(400, 1000)
     else:
         # pyserial 없을 때 mock 데이터
         print("[INFO] pyserial이 설치되지 않았습니다. Mock 데이터를 사용합니다.")
