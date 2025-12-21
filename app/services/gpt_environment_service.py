@@ -39,7 +39,7 @@ CO2 농도: {co2_str}
   - HEATING: 난방이 필요할 때 (예: 기온 낮음)
   - COOLING: 냉방이 필요할 때 (예: 기온 높음)
   - NORMAL: 특별한 조치가 필요 없을 때
-- "advice": 최대 4~6문장의 자연스러운 한국어 조언
+- "advice": 최대 3문장의 간결한 한국어 조언
 """
 
     response = client.chat.completions.create(

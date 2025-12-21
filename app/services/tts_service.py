@@ -78,8 +78,8 @@ def play_tts(text: str, lang: str = 'ko') -> None:
                     if 'PULSE_SERVER' not in env:
                         env['PULSE_SERVER'] = '/run/user/1000/pulse/native'  # PulseAudio 서버 주소
 
-                    # 타임아웃: 텍스트 길이에 따라 동적 조정 (최소 60초)
-                    timeout_seconds = max(60, len(text) // 10)  # 텍스트 10자당 1초, 최소 60초
+                    # 타임아웃: 텍스트 길이에 따라 동적 조정 (최소 120초로 증가)
+                    timeout_seconds = max(120, len(text) // 10)  # 텍스트 10자당 1초, 최소 120초
 
                     # Popen 사용 (중단 가능하도록)
                     current_tts_process = subprocess.Popen(

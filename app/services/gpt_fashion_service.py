@@ -33,7 +33,7 @@ def generate_fashion_text(weather_data):
   - COLD: 날씨가 추워 따뜻한 옷차림이 필요할 때
   - HOT: 날씨가 더워 가벼운 옷차림이 필요할 때
   - NORMAL: 평범한 날씨일 때
-- "advice": 최대 4~6문장의 구체적인 한국어 옷차림 추천 (겉옷/상의/하의/소품 등)
+- "advice": 최대 3문장의 간결한 한국어 옷차림 추천 (겉옷/상의/하의/소품 등)
 """
 
     response = client.chat.completions.create(
