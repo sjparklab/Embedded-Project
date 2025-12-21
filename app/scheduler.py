@@ -4,7 +4,7 @@ APScheduler를 사용하여 주기적인 작업 수행
 """
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.services.person_detection_service import detect_person_from_webcam
-from app.services.joystick_service import process_environment_advice
+from app.services.joystick_service import process_environment_advice, reset_stop_request
 import atexit
 
 # 스케줄러 인스턴스
@@ -20,6 +20,8 @@ def scheduled_person_detection():
     if result.get("person_detected"):
         print("[SCHEDULER] 사람 감지됨 → 실내 환경 조언 실행")
         try:
+            # 중단 요청 플래그 초기화 (이전 중단 명령이 남아있을 수 있음)
+            reset_stop_request()
             process_environment_advice()
         except Exception as e:
             print(f"[SCHEDULER] 환경 조언 실행 중 오류: {e}")
