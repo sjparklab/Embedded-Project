@@ -31,13 +31,20 @@ def create_app():
     # Swagger 적용
     Swagger(app, config=swagger_config, template_file=None)
 
-    # 백그라운드 스케줄러 시작
-    from app.scheduler import start_scheduler
-    start_scheduler()
+    # 백그라운드 작업 시작 (중복 실행 방지)
+    # Flask debug 모드에서는 리로더(Reloader)가 프로세스를 2개 띄우므로, 
+    # 실제 서버 로직이 도는 자식 프로세스(WERKZEUG_RUN_MAIN='true')에서만 스레드를 시작합니다.
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        # 백그라운드 스케줄러 시작
+        from app.scheduler import start_scheduler
+        start_scheduler()
 
-    # 조이스틱 리스너 시작
-    from app.services.joystick_service import start_joystick_listener
-    start_joystick_listener()
+        # 조이스틱 리스너 시작
+        from app.services.joystick_service import start_joystick_listener
+        start_joystick_listener()
+    
+    # 만약 debug=False(프로덕션)로 실행하여 리로더가 없는 경우를 대비하려면
+    # 별도의 환경변수나 로직이 필요하지만, 현재는 run.py의 debug=True 환경에 맞춤.
 
     # -------- Swagger 문서 --------
     @app.route("/docs")
